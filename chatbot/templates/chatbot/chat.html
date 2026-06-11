@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GenAI — Powered by Llama 3.3</title>
-  <meta name="description" content="Premium AI chatbot powered by Llama 3.3 70B via Groq"/>
+  <title>GenAI</title>
+  <meta name="description" content="GenAI — Your intelligent AI assistant"/>
   {% load static %}
   <link rel="icon" type="image/png" href="{% static 'chatbot/logo.png' %}"/>
+  <link rel="shortcut icon" type="image/png" href="{% static 'chatbot/logo.png' %}"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -537,7 +538,7 @@
     <img src="{% static 'chatbot/logo.png' %}" class="logo-icon" style="object-fit:cover;border-radius:10px;" alt="GenAI Logo"/>
     <div>
       <div class="logo-text">GenAI</div>
-      <div class="logo-sub">Llama 3.3 · Groq</div>
+      <div class="logo-sub">Your AI Assistant</div>
     </div>
   </div>
 
@@ -556,8 +557,8 @@
     <div class="model-badge">
       <div class="model-dot"></div>
       <div>
-        <div class="model-name">Llama 3.3 70B</div>
-        <div class="model-sub">Free · Ultra-fast via Groq</div>
+        <div class="model-name">GenAI</div>
+        <div class="model-sub">Online · Ready to chat</div>
       </div>
     </div>
   </div>
@@ -573,7 +574,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="model-pill">
-        Model: <span>Llama 3.3 70B</span>
+        <span>GenAI</span> · AI Assistant
       </div>
     </div>
     <button id="clear-btn" title="Clear conversation">
@@ -589,7 +590,7 @@
       <img src="{% static 'chatbot/logo.png' %}" class="welcome-icon" style="object-fit:cover;border-radius:20px;" alt="GenAI"/>
       <div>
         <h2>Hello! I'm <span>GenAI</span></h2>
-        <p style="margin-top:8px;">Powered by Llama 3.3 70B. Ask me anything — code, math, writing, analysis, or just a conversation.</p>
+        <p style="margin-top:8px;">Ask me anything — code, math, writing, analysis, or just a conversation.</p>
       </div>
       <div class="chips-grid">
         <div class="chip" onclick="fillPrompt(this)">
