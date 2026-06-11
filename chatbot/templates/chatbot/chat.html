@@ -1,105 +1,847 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>GenAI Chatbot</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GenAI — Powered by Llama 3.3</title>
+  <meta name="description" content="Premium AI chatbot powered by Llama 3.3 70B via Groq"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container {
-            background: #ffffff;
-            width: 90%;
-            max-width: 600px;
-            margin-top: 50px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-        }
+    :root {
+      --bg:          #080910;
+      --sidebar-bg:  #0e0f14;
+      --surface:     #13151e;
+      --card:        #1a1d2a;
+      --card2:       #1e2133;
+      --border:      rgba(255,255,255,0.07);
+      --border2:     rgba(255,255,255,0.12);
+      --accent:      #7c6aff;
+      --accent2:     #b49cff;
+      --accent-glow: rgba(124,106,255,0.3);
+      --user-bg:     linear-gradient(135deg,#7c6aff,#b49cff);
+      --text:        #e8eaf0;
+      --text2:       #9499b0;
+      --muted:       #555872;
+      --success:     #22d3a5;
+      --danger:      #ff5e6a;
+      --radius:      16px;
+      --sidebar-w:   260px;
+    }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
+    html, body { height: 100%; }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        input[type="text"] {
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            outline: none;
-            transition: border 0.3s;
-        }
+    /* ════════════════════════════════
+       SIDEBAR
+    ════════════════════════════════ */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 12px;
+      gap: 6px;
+      z-index: 20;
+      transition: transform 0.3s ease;
+    }
 
-        input[type="text"]:focus {
-            border-color: #5e9cff;
-        }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
 
-        button {
-            padding: 12px;
-            font-size: 16px;
-            background-color: #5e9cff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 0 16px var(--accent-glow);
+      flex-shrink: 0;
+    }
 
-        button:hover {
-            background-color: #3b84f1;
-        }
+    .logo-text { font-size: 1rem; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-sub  { font-size: 0.68rem; color: var(--text2); margin-top: 1px; }
 
-        .response-box {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-left: 4px solid #5e9cff;
-            border-radius: 8px;
-            white-space: pre-wrap;
-        }
+    .sidebar-new-chat {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      background: rgba(124,106,255,0.1);
+      border: 1px solid rgba(124,106,255,0.25);
+      border-radius: 10px;
+      color: var(--accent2);
+      font-size: 0.83rem; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px;
+    }
+    .sidebar-new-chat:hover {
+      background: rgba(124,106,255,0.18);
+      border-color: rgba(124,106,255,0.5);
+    }
 
-        @media (max-width: 500px) {
-            .container {
-                padding: 20px;
-            }
+    .sidebar-section {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 10px;
+      margin: 4px 0;
+    }
 
-            input[type="text"], button {
-                font-size: 14px;
-            }
-        }
-    </style>
+    .sidebar-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.05); color: var(--text); }
+    .sidebar-item.active { background: rgba(124,106,255,0.12); color: var(--text); }
+    .sidebar-item svg { flex-shrink: 0; opacity: 0.6; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .model-badge {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.78rem;
+    }
+    .model-dot {
+      width: 8px; height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2.5s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 0 0 rgba(34,211,165,0.4); }
+      50%      { opacity:0.8; transform:scale(1.2); box-shadow:0 0 0 4px rgba(34,211,165,0); }
+    }
+    .model-name { font-weight: 500; color: var(--text); }
+    .model-sub  { font-size: 0.68rem; color: var(--text2); }
+
+    /* ════════════════════════════════
+       MAIN AREA
+    ════════════════════════════════ */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Ambient glow background */
+    #main::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,106,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,9,16,0.7);
+      backdrop-filter: blur(16px);
+      position: relative; z-index: 10;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+
+    #menu-btn {
+      display: none;
+      background: none; border: none; color: var(--text2);
+      cursor: pointer; padding: 4px; border-radius: 6px;
+      transition: color 0.2s;
+    }
+    #menu-btn:hover { color: var(--text); }
+
+    .model-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      font-size: 0.8rem; font-weight: 500;
+      color: var(--text2);
+    }
+    .model-pill span { color: var(--accent2); }
+
+    #clear-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: rgba(255,94,106,0.08);
+      color: var(--danger);
+      border: 1px solid rgba(255,94,106,0.2);
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.78rem; font-weight: 500;
+      transition: all 0.2s;
+    }
+    #clear-btn:hover { background: rgba(255,94,106,0.15); border-color: rgba(255,94,106,0.4); }
+
+    /* ── Chat window ── */
+    #chat-window {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative; z-index: 1;
+      scroll-behavior: smooth;
+    }
+
+    #chat-window::-webkit-scrollbar { width: 5px; }
+    #chat-window::-webkit-scrollbar-track { background: transparent; }
+    #chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+    /* ── Empty / Welcome state ── */
+    #empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      text-align: center;
+      padding: 40px 24px;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .welcome-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 8px 32px var(--accent-glow);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    #empty-state h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; }
+    #empty-state h2 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #empty-state p { color: var(--text2); font-size: 0.9rem; max-width: 360px; line-height: 1.7; }
+
+    .chips-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 520px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      padding: 12px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.8rem;
+      color: var(--text2);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+    .chip:hover {
+      border-color: rgba(124,106,255,0.4);
+      background: rgba(124,106,255,0.08);
+      color: var(--text);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .chip-icon { font-size: 1rem; margin-bottom: 4px; display: block; }
+
+    /* ── Message rows ── */
+    .message-row {
+      padding: 6px 0;
+      animation: fadeUp 0.3s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .message-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .message-row.user .message-inner { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .message-row.user  .avatar { background: linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow: 0 4px 12px var(--accent-glow); }
+    .message-row.model .avatar { background: var(--card2); border: 1px solid var(--border2); }
+
+    .bubble-col { display: flex; flex-direction: column; gap: 5px; min-width:0; }
+    .message-row.user  .bubble-col { align-items: flex-end; }
+    .message-row.model .bubble-col { align-items: flex-start; }
+
+    .bubble {
+      padding: 13px 17px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .message-row.user .bubble {
+      background: linear-gradient(135deg, var(--accent), #9b87ff);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+      box-shadow: 0 4px 20px rgba(124,106,255,0.25);
+    }
+    .message-row.model .bubble {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 5px;
+      color: var(--text);
+    }
+
+    /* Markdown styling inside model bubble */
+    .bubble p  { margin-bottom: 10px; }
+    .bubble p:last-child { margin-bottom: 0; }
+    .bubble h1,.bubble h2,.bubble h3 { margin: 14px 0 7px; color: var(--accent2); font-weight: 600; }
+    .bubble ul,.bubble ol { padding-left: 22px; margin-bottom: 10px; }
+    .bubble li { margin-bottom: 5px; }
+    .bubble code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: rgba(124,106,255,0.12);
+      border: 1px solid rgba(124,106,255,0.2);
+      padding: 2px 7px;
+      border-radius: 5px;
+      color: var(--accent2);
+    }
+    .bubble pre {
+      background: #0b0c12;
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      margin: 10px 0;
+      position: relative;
+    }
+    .bubble pre code { background:none; border:none; padding:0; color:#cdd6f4; font-size:0.82rem; }
+    .bubble strong { color: var(--accent2); }
+    .bubble a { color: var(--accent2); text-decoration: underline; text-underline-offset: 3px; }
+    .bubble blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      color: var(--text2);
+      margin: 8px 0;
+      font-style: italic;
+    }
+    .bubble table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 0.82rem; }
+    .bubble th { background: rgba(124,106,255,0.1); color: var(--accent2); padding: 8px 12px; border: 1px solid var(--border2); }
+    .bubble td { padding: 7px 12px; border: 1px solid var(--border); }
+
+    .meta {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.68rem; color: var(--muted);
+      padding: 0 4px;
+    }
+
+    .copy-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 0.68rem;
+      padding: 2px 7px; border-radius: 5px;
+      transition: all 0.2s; display: flex; align-items: center; gap: 3px;
+    }
+    .copy-btn:hover { color: var(--accent2); background: rgba(124,106,255,0.1); }
+    .copy-btn.copied { color: var(--success); }
+
+    /* ── Typing indicator ── */
+    .typing-row {
+      padding: 6px 0;
+      animation: fadeUp 0.3s ease;
+    }
+    .typing-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .typing-bubble {
+      padding: 16px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 5px;
+      display: flex; gap: 6px; align-items: center;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite;
+      opacity: 0.7;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%,60%,100% { transform:translateY(0); opacity:0.7; }
+      30%          { transform:translateY(-7px); opacity:1; background: var(--accent2); }
+    }
+
+    /* ── Input area ── */
+    #input-area {
+      padding: 16px 24px 20px;
+      background: rgba(8,9,16,0.8);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      position: relative; z-index: 10;
+    }
+
+    .input-container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .input-box {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 12px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-box:focus-within {
+      border-color: rgba(124,106,255,0.5);
+      box-shadow: 0 0 0 3px rgba(124,106,255,0.1), 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    #prompt-input {
+      flex: 1;
+      background: none; border: none; outline: none;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      resize: none;
+      min-height: 24px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    #prompt-input::placeholder { color: var(--muted); }
+    #prompt-input::-webkit-scrollbar { width: 3px; }
+    #prompt-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .input-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    #char-count {
+      font-size: 0.68rem; color: var(--muted);
+      align-self: flex-end; padding-bottom: 2px;
+    }
+    #char-count.warn { color: var(--danger); }
+
+    #send-btn {
+      width: 38px; height: 38px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 11px;
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    #send-btn svg { width: 18px; height: 18px; }
+    #send-btn:hover:not(:disabled) { transform: scale(1.08); box-shadow: 0 6px 24px rgba(124,106,255,0.45); }
+    #send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    .hint { text-align:center; font-size:0.68rem; color:var(--muted); margin-top:10px; }
+    .hint kbd { 
+      padding: 1px 5px; border-radius: 4px;
+      border: 1px solid var(--border2);
+      background: var(--card2); font-size: 0.66rem;
+    }
+
+    /* ════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════ */
+    @media (max-width: 768px) {
+      #sidebar { position: fixed; top:0; left:0; height:100%; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0,0,0,0.5); }
+      #menu-btn { display: flex; }
+      #chat-window { padding: 20px 0; }
+      .message-inner, .typing-inner { padding: 0 14px; }
+      .chips-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>GenAI Chatbot</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="text" name="prompt" placeholder="Enter your prompt" required>
-            <button type="submit">Generate</button>
-        </form>
 
-        {% if response %}
-            <div class="response-box">
-                <strong>Response:</strong><br>
-                {{ response }}
-            </div>
-        {% endif %}
+<!-- ═══ SIDEBAR ═══ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">✦</div>
+    <div>
+      <div class="logo-text">GenAI</div>
+      <div class="logo-sub">Llama 3.3 · Groq</div>
     </div>
+  </div>
+
+  <button class="sidebar-new-chat" id="new-chat-btn">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New Chat
+  </button>
+
+  <div class="sidebar-section">Recent</div>
+  <div class="sidebar-item active">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Current session
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="model-badge">
+      <div class="model-dot"></div>
+      <div>
+        <div class="model-name">Llama 3.3 70B</div>
+        <div class="model-sub">Free · Ultra-fast via Groq</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div class="topbar-left">
+      <button id="menu-btn" title="Toggle sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="model-pill">
+        Model: <span>Llama 3.3 70B</span>
+      </div>
+    </div>
+    <button id="clear-btn" title="Clear conversation">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      Clear
+    </button>
+  </div>
+
+  <!-- Chat window -->
+  <div id="chat-window">
+    {% if not messages %}
+    <div id="empty-state">
+      <div class="welcome-icon">✦</div>
+      <div>
+        <h2>Hello! I'm <span>GenAI</span></h2>
+        <p style="margin-top:8px;">Powered by Llama 3.3 70B. Ask me anything — code, math, writing, analysis, or just a conversation.</p>
+      </div>
+      <div class="chips-grid">
+        <div class="chip" onclick="fillPrompt(this)">
+          <span class="chip-icon">💻</span>Write a Python web scraper
+        </div>
+        <div class="chip" onclick="fillPrompt(this)">
+          <span class="chip-icon">⚛️</span>Explain quantum computing
+        </div>
+        <div class="chip" onclick="fillPrompt(this)">
+          <span class="chip-icon">📊</span>Summarize machine learning
+        </div>
+        <div class="chip" onclick="fillPrompt(this)">
+          <span class="chip-icon">✍️</span>Give me a creative story idea
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% for msg in messages %}
+    <div class="message-row {{ msg.role }}" id="msg-{{ msg.id }}">
+      <div class="message-inner">
+        <div class="avatar">
+          {% if msg.role == 'user' %}👤{% else %}✦{% endif %}
+        </div>
+        <div class="bubble-col">
+          <div class="bubble" id="bubble-{{ msg.id }}">
+            {% if msg.role == 'model' %}
+              <span class="md-content" data-raw="{{ msg.content|escapejs }}"></span>
+            {% else %}
+              {{ msg.content }}
+            {% endif %}
+          </div>
+          <div class="meta">
+            <span>{{ msg.created_at|time:"H:i" }}</span>
+            {% if msg.role == 'model' %}
+            <button class="copy-btn" onclick="copyBubble('bubble-{{ msg.id }}', this)">
+              ⎘ Copy
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Input area -->
+  <div id="input-area">
+    <div class="input-container">
+      <div class="input-box">
+        <textarea
+          id="prompt-input"
+          placeholder="Message GenAI..."
+          rows="1"
+          maxlength="4000"
+          autofocus
+        ></textarea>
+        <div class="input-actions">
+          <span id="char-count">0 / 4000</span>
+          <button id="send-btn" title="Send (Enter)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="hint">Press <kbd>Enter</kbd> to send &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> for new line</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const SEND_URL  = "{% url 'send_message' %}";
+  const CLEAR_URL = "{% url 'clear_chat' %}";
+  const CSRF      = "{{ csrf_token }}";
+
+  const chatWindow = document.getElementById('chat-window');
+  const input      = document.getElementById('prompt-input');
+  const sendBtn    = document.getElementById('send-btn');
+  const charCount  = document.getElementById('char-count');
+  const clearBtn   = document.getElementById('clear-btn');
+  const sidebar    = document.getElementById('sidebar');
+  const menuBtn    = document.getElementById('menu-btn');
+  const newChatBtn = document.getElementById('new-chat-btn');
+
+  // ── Render existing markdown on page load ──
+  document.querySelectorAll('.md-content').forEach(el => {
+    el.innerHTML = marked.parse(el.dataset.raw || '');
+  });
+  scrollToBottom();
+
+  // ── Sidebar toggle (mobile) ──
+  menuBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+  document.addEventListener('click', e => {
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // ── New chat = clear ──
+  newChatBtn.addEventListener('click', () => {
+    if (!confirm('Start a new conversation?')) return;
+    clearConversation();
+  });
+
+  // ── Auto-resize textarea ──
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+    const len = input.value.length;
+    charCount.textContent = len + ' / 4000';
+    charCount.classList.toggle('warn', len > 3800);
+  });
+
+  // ── Enter to send ──
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  // ── Send message ──
+  async function sendMessage() {
+    const prompt = input.value.trim();
+    if (!prompt || sendBtn.disabled) return;
+
+    removeEmptyState();
+    appendMessage('user', prompt);
+    input.value = '';
+    input.style.height = 'auto';
+    charCount.textContent = '0 / 4000';
+    sendBtn.disabled = true;
+
+    const typingEl = appendTyping();
+
+    try {
+      const res = await fetch(SEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      typingEl.remove();
+      appendMessage('model', data.reply || ('⚠️ ' + (data.error || 'Something went wrong.')));
+    } catch (err) {
+      typingEl.remove();
+      appendMessage('model', '⚠️ Network error. Please try again.');
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  // ── Clear chat ──
+  clearBtn.addEventListener('click', () => {
+    if (!confirm('Clear the entire conversation?')) return;
+    clearConversation();
+  });
+
+  async function clearConversation() {
+    await fetch(CLEAR_URL, { method: 'POST', headers: { 'X-CSRFToken': CSRF } });
+    chatWindow.innerHTML = '';
+    showEmptyState();
+  }
+
+  // ── Append message row ──
+  function appendMessage(role, content) {
+    const row = document.createElement('div');
+    row.className = 'message-row ' + role;
+    const isModel = role === 'model';
+    const bubbleId = 'bubble-' + Date.now();
+    const now = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+    row.innerHTML = `
+      <div class="message-inner">
+        <div class="avatar">${isModel ? '✦' : '👤'}</div>
+        <div class="bubble-col">
+          <div class="bubble" id="${bubbleId}">
+            ${isModel ? marked.parse(content) : escapeHtml(content)}
+          </div>
+          <div class="meta">
+            <span>${time}</span>
+            ${isModel ? `<button class="copy-btn" onclick="copyBubble('${bubbleId}', this)">⎘ Copy</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+    chatWindow.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  // ── Typing indicator ──
+  function appendTyping() {
+    const row = document.createElement('div');
+    row.className = 'typing-row';
+    row.innerHTML = `
+      <div class="typing-inner">
+        <div class="avatar" style="background:var(--card2);border:1px solid var(--border2);">✦</div>
+        <div class="typing-bubble">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>`;
+    chatWindow.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  // ── Copy bubble ──
+  function copyBubble(id, btn) {
+    const el = document.getElementById(id);
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      btn.textContent = '✓ Copied'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // ── Suggestion chips ──
+  function fillPrompt(chip) {
+    input.value = chip.innerText.replace(/^[^\w]+/, '').trim();
+    input.dispatchEvent(new Event('input'));
+    input.focus();
+  }
+
+  // ── Helpers ──
+  function scrollToBottom() { chatWindow.scrollTop = chatWindow.scrollHeight; }
+
+  function removeEmptyState() {
+    const es = document.getElementById('empty-state');
+    if (es) es.remove();
+  }
+
+  function showEmptyState() {
+    chatWindow.innerHTML = `
+      <div id="empty-state">
+        <div class="welcome-icon">✦</div>
+        <div>
+          <h2>Hello! I'm <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GenAI</span></h2>
+          <p style="margin-top:8px;color:var(--text2);font-size:0.9rem;max-width:360px;line-height:1.7;">Start a fresh conversation — ask me anything!</p>
+        </div>
+        <div class="chips-grid">
+          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">💻</span>Write a Python web scraper</div>
+          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">⚛️</span>Explain quantum computing</div>
+          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">📊</span>Summarize machine learning</div>
+          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">✍️</span>Give me a creative story idea</div>
+        </div>
+      </div>`;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
 </body>
 </html>
