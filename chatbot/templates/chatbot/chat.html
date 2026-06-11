@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GenAI — Powered by Llama 3.3</title>
   <meta name="description" content="Premium AI chatbot powered by Llama 3.3 70B via Groq"/>
+  {% load static %}
+  <link rel="icon" type="image/png" href="{% static 'chatbot/logo.png' %}"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -532,7 +534,7 @@
 <!-- ═══ SIDEBAR ═══ -->
 <aside id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-icon">✦</div>
+    <img src="{% static 'chatbot/logo.png' %}" class="logo-icon" style="object-fit:cover;border-radius:10px;" alt="GenAI Logo"/>
     <div>
       <div class="logo-text">GenAI</div>
       <div class="logo-sub">Llama 3.3 · Groq</div>
@@ -584,7 +586,7 @@
   <div id="chat-window">
     {% if not messages %}
     <div id="empty-state">
-      <div class="welcome-icon">✦</div>
+      <img src="{% static 'chatbot/logo.png' %}" class="welcome-icon" style="object-fit:cover;border-radius:20px;" alt="GenAI"/>
       <div>
         <h2>Hello! I'm <span>GenAI</span></h2>
         <p style="margin-top:8px;">Powered by Llama 3.3 70B. Ask me anything — code, math, writing, analysis, or just a conversation.</p>
@@ -610,7 +612,7 @@
     <div class="message-row {{ msg.role }}" id="msg-{{ msg.id }}">
       <div class="message-inner">
         <div class="avatar">
-          {% if msg.role == 'user' %}👤{% else %}✦{% endif %}
+          {% if msg.role == 'user' %}👤{% else %}<img src="{% static 'chatbot/logo.png' %}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;" alt="AI"/>{% endif %}
         </div>
         <div class="bubble-col">
           <div class="bubble" id="bubble-{{ msg.id }}">
@@ -665,6 +667,7 @@
   const SEND_URL  = "{% url 'send_message' %}";
   const CLEAR_URL = "{% url 'clear_chat' %}";
   const CSRF      = "{{ csrf_token }}";
+  const LOGO_URL  = "{% static 'chatbot/logo.png' %}";
 
   const chatWindow = document.getElementById('chat-window');
   const input      = document.getElementById('prompt-input');
@@ -766,7 +769,7 @@
 
     row.innerHTML = `
       <div class="message-inner">
-        <div class="avatar">${isModel ? '✦' : '👤'}</div>
+        <div class="avatar">${isModel ? `<img src="${LOGO_URL}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;" alt="AI"/>` : '👤'}</div>
         <div class="bubble-col">
           <div class="bubble" id="${bubbleId}">
             ${isModel ? marked.parse(content) : escapeHtml(content)}
@@ -788,7 +791,7 @@
     row.className = 'typing-row';
     row.innerHTML = `
       <div class="typing-inner">
-        <div class="avatar" style="background:var(--card2);border:1px solid var(--border2);">✦</div>
+        <div class="avatar" style="background:var(--card2);border:1px solid var(--border2);"><img src="${LOGO_URL}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;" alt="AI"/></div>
         <div class="typing-bubble">
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
