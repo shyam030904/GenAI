@@ -7,11 +7,15 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# ── Load Groq API key ──
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+# ── Load Groq / Grok API key ──
+GROQ_API_KEY = (
+    os.environ.get("GROQ_API_KEY", "").strip()
+    or os.environ.get("GROK_API_KEY", "").strip()
+    or os.environ.get("XAI_API_KEY", "").strip()
+)
 
 if not GROQ_API_KEY:
-    raise ValueError("No GROQ_API_KEY found in .env file. Get a free key at https://console.groq.com/keys")
+    raise ValueError("No GROQ_API_KEY or GROK_API_KEY found in .env file.")
 
 logger.info("✅ Groq API key loaded successfully.")
 
