@@ -2,8 +2,12 @@ services:
   - type: web
     name: genai-chatbot
     env: python
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
     startCommand: "gunicorn genai_app.wsgi:application"
     envVars:
-      - key: GOOGLE_API_KEY
-        value: your_api_key_here
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROK_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.12.0
