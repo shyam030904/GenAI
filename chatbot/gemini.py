@@ -7,50 +7,50 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# ── Load Groq / Grok API key ──
-GROQ_API_KEY = (
-    os.environ.get("GROQ_API_KEY", "").strip()
-    or os.environ.get("GROK_API_KEY", "").strip()
-    or os.environ.get("XAI_API_KEY", "").strip()
-)
-
-if not GROQ_API_KEY:
-    raise ValueError("No GROQ_API_KEY or GROK_API_KEY found in .env file.")
-
-logger.info("✅ Groq API key loaded successfully.")
-
 # Max history messages to keep token usage low
 MAX_HISTORY = 10
 
-# Groq client
-client = Groq(api_key=GROQ_API_KEY)
+
+def get_api_key() -> str:
+    """Safely retrieves API key from environment."""
+    return (
+        os.environ.get("GROQ_API_KEY", "").strip()
+        or os.environ.get("GROK_API_KEY", "").strip()
+        or os.environ.get("XAI_API_KEY", "").strip()
+        or os.environ.get("GOOGLE_API_KEY", "").strip()
+    )
 
 
 def generate_response(prompt: str, history: list) -> str:
     """
     Sends a prompt to Groq (Llama 3.3 70B) with conversation history.
-    - Trims history to last MAX_HISTORY messages to reduce token usage.
-    - Groq free tier: 14,400 requests/day — very generous.
+    - Lazily initializes Groq client so application startup never fails (avoids 502 Bad Gateway).
     """
-
-    # ── Convert Django DB history format → Groq messages format ──
-    trimmed = history[-MAX_HISTORY:] if len(history) > MAX_HISTORY else history
-
-    messages = []
-    for msg in trimmed:
-        role = msg.get("role", "user")
-        # Groq uses 'assistant' not 'model'
-        if role == "model":
-            role = "assistant"
-        content = msg.get("parts", [""])[0] if isinstance(msg.get("parts"), list) else msg.get("content", "")
-        messages.append({"role": role, "content": content})
-
-    # Add the new user message
-    messages.append({"role": "user", "content": prompt})
+    api_key = get_api_key()
+    if not api_key:
+        logger.error("❌ No API key found in environment variables.")
+        return "⚠️ Error: No GROQ_API_KEY or GROK_API_KEY set in environment variables. Please configure it in Render Dashboard settings."
 
     try:
+        client = Groq(api_key=api_key)
+
+        # ── Convert Django DB history format → Groq messages format ──
+        trimmed = history[-MAX_HISTORY:] if len(history) > MAX_HISTORY else history
+
+        messages = []
+        for msg in trimmed:
+            role = msg.get("role", "user")
+            # Groq uses 'assistant' not 'model'
+            if role == "model":
+                role = "assistant"
+            content = msg.get("parts", [""])[0] if isinstance(msg.get("parts"), list) else msg.get("content", "")
+            messages.append({"role": role, "content": content})
+
+        # Add the new user message
+        messages.append({"role": "user", "content": prompt})
+
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # Free, fast, highly capable
+            model="llama-3.3-70b-versatile",
             messages=messages,
             max_tokens=2048,
             temperature=0.7,
