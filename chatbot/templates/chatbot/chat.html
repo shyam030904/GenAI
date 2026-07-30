@@ -33,6 +33,31 @@
       --danger:      #ff5e6a;
       --radius:      16px;
       --sidebar-w:   260px;
+      --topbar-bg:   rgba(8,9,16,0.7);
+      --input-area-bg: rgba(8,9,16,0.8);
+      --code-bg:     #0b0c12;
+    }
+
+    [data-theme="light"] {
+      --bg:          #f4f5fa;
+      --sidebar-bg:  #ffffff;
+      --surface:     #ffffff;
+      --card:        #ffffff;
+      --card2:       #f0f2f8;
+      --border:      rgba(0,0,0,0.08);
+      --border2:     rgba(0,0,0,0.15);
+      --accent:      #6355ff;
+      --accent2:     #5243ed;
+      --accent-glow: rgba(99,85,255,0.2);
+      --user-bg:     linear-gradient(135deg,#6355ff,#8477ff);
+      --text:        #151724;
+      --text2:       #5c627a;
+      --muted:       #8a90a6;
+      --success:     #059669;
+      --danger:      #e11d48;
+      --topbar-bg:   rgba(244,245,250,0.85);
+      --input-area-bg: rgba(244,245,250,0.9);
+      --code-bg:     #1e1e2e;
     }
 
     html, body { height: 100%; }
@@ -121,10 +146,24 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      position: relative;
     }
     .sidebar-item:hover  { background: rgba(255,255,255,0.05); color: var(--text); }
     .sidebar-item.active { background: rgba(124,106,255,0.12); color: var(--text); }
     .sidebar-item svg { flex-shrink: 0; opacity: 0.6; }
+    .sidebar-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+
+    .delete-btn {
+      display: none;
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      padding: 3px; border-radius: 5px;
+      flex-shrink: 0;
+      transition: color 0.15s, background 0.15s;
+      align-items: center; justify-content: center;
+    }
+    .sidebar-item:hover .delete-btn { display: flex; }
+    .delete-btn:hover { color: var(--danger); background: rgba(255,94,106,0.1); }
 
     .sidebar-footer {
       margin-top: auto;
@@ -179,10 +218,10 @@
 
     /* ── Top bar ── */
     #topbar {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: 14px 24px;
       border-bottom: 1px solid var(--border);
-      background: rgba(8,9,16,0.7);
+      background: var(--topbar-bg);
       backdrop-filter: blur(16px);
       position: relative; z-index: 10;
     }
@@ -208,18 +247,23 @@
     }
     .model-pill span { color: var(--accent2); }
 
-    #clear-btn {
+    .theme-toggle-btn {
       display: flex; align-items: center; gap: 6px;
-      padding: 7px 14px;
-      background: rgba(255,94,106,0.08);
-      color: var(--danger);
-      border: 1px solid rgba(255,94,106,0.2);
-      border-radius: 9px;
+      padding: 6px 14px;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      color: var(--text);
+      font-size: 0.8rem; font-weight: 500;
       cursor: pointer;
-      font-size: 0.78rem; font-weight: 500;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
+      user-select: none;
     }
-    #clear-btn:hover { background: rgba(255,94,106,0.15); border-color: rgba(255,94,106,0.4); }
+    .theme-toggle-btn:hover {
+      border-color: var(--accent);
+      background: rgba(124,106,255,0.12);
+      transform: translateY(-1px);
+    }
 
     /* ── Chat window ── */
     #chat-window {
@@ -264,10 +308,14 @@
       50%      { transform: translateY(-8px); }
     }
 
-    #empty-state h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; }
-    #empty-state h2 span {
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    #empty-state h2 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--text) 30%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     #empty-state p { color: var(--text2); font-size: 0.9rem; max-width: 360px; line-height: 1.7; }
 
@@ -446,72 +494,85 @@
 
     /* ── Input area ── */
     #input-area {
-      padding: 16px 24px 20px;
-      background: rgba(8,9,16,0.8);
+      padding: 16px 24px 24px;
+      background: var(--input-area-bg);
       backdrop-filter: blur(16px);
       border-top: 1px solid var(--border);
       position: relative; z-index: 10;
     }
 
     .input-container {
-      max-width: 760px;
+      max-width: 720px;
       margin: 0 auto;
     }
 
     .input-box {
       display: flex;
-      align-items: flex-end;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
       background: var(--card);
       border: 1px solid var(--border2);
-      border-radius: 16px;
-      padding: 12px 14px;
+      border-radius: 999px;
+      padding: 8px 8px 8px 16px;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     .input-box:focus-within {
-      border-color: rgba(124,106,255,0.5);
-      box-shadow: 0 0 0 3px rgba(124,106,255,0.1), 0 4px 24px rgba(0,0,0,0.4);
+      border-color: rgba(124,106,255,0.45);
+      box-shadow: 0 0 0 3px rgba(124,106,255,0.08), 0 4px 24px rgba(0,0,0,0.4);
     }
+
+    #plus-btn {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      padding: 4px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: color 0.2s, background 0.2s;
+    }
+    #plus-btn:hover { color: var(--accent2); background: rgba(124,106,255,0.1); }
 
     #prompt-input {
       flex: 1;
       background: none; border: none; outline: none;
       color: var(--text);
       font-family: 'Inter', sans-serif;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       line-height: 1.5;
       resize: none;
       min-height: 24px;
-      max-height: 160px;
+      max-height: 120px;
       overflow-y: auto;
+      align-self: center;
     }
     #prompt-input::placeholder { color: var(--muted); }
     #prompt-input::-webkit-scrollbar { width: 3px; }
     #prompt-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    .input-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .input-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-    #char-count {
-      font-size: 0.68rem; color: var(--muted);
-      align-self: flex-end; padding-bottom: 2px;
+    #mic-btn {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      padding: 6px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, background 0.2s;
     }
-    #char-count.warn { color: var(--danger); }
+    #mic-btn:hover { color: var(--accent2); background: rgba(124,106,255,0.1); }
 
     #send-btn {
-      width: 38px; height: 38px; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; border-radius: 11px;
-      color: #fff; cursor: pointer;
+      width: 40px; height: 40px; flex-shrink: 0;
+      background: var(--text);
+      border: none; border-radius: 50%;
+      color: var(--bg); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: opacity 0.2s, transform 0.15s, background 0.2s;
     }
-    #send-btn svg { width: 18px; height: 18px; }
-    #send-btn:hover:not(:disabled) { transform: scale(1.08); box-shadow: 0 6px 24px rgba(124,106,255,0.45); }
-    #send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    #send-btn svg { width: 17px; height: 17px; }
+    #send-btn:hover:not(:disabled) { transform: scale(1.08); background: var(--accent2); color: #fff; }
+    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
     .hint { text-align:center; font-size:0.68rem; color:var(--muted); margin-top:10px; }
-    .hint kbd { 
+    .hint kbd {
       padding: 1px 5px; border-radius: 4px;
       border: 1px solid var(--border2);
       background: var(--card2); font-size: 0.66rem;
@@ -548,20 +609,12 @@
   </button>
 
   <div class="sidebar-section">Recent</div>
-  <div class="sidebar-item active">
+  <div class="sidebar-item active" id="current-session">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    Current session
-  </div>
-
-  <div class="sidebar-footer">
-    <div class="model-badge">
-      <div class="model-dot"></div>
-      <div>
-        <div class="model-name">GenAI</div>
-        <div class="model-sub">Online · Ready to chat</div>
-      </div>
-    </div>
-  </div>
+    <span>Current session</span>
+    <button class="delete-btn" title="Delete conversation">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
 </aside>
 
 <!-- ═══ MAIN ═══ -->
@@ -577,9 +630,9 @@
         <span>GenAI</span> · AI Assistant
       </div>
     </div>
-    <button id="clear-btn" title="Clear conversation">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      Clear
+    <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Light/Dark Theme">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-text">Dark</span>
     </button>
   </div>
 
@@ -588,23 +641,25 @@
     {% if not messages %}
     <div id="empty-state">
       <img src="{% static 'chatbot/logo.png' %}" class="welcome-icon" style="object-fit:cover;border-radius:20px;" alt="GenAI"/>
-      <div>
-        <h2>Hello! I'm <span>GenAI</span></h2>
-        <p style="margin-top:8px;">Ask me anything — code, math, writing, analysis, or just a conversation.</p>
-      </div>
+      <h2>Ask anything</h2>
+      <p>I can help you write code, analyze data, draft documents, or answer any question.</p>
       <div class="chips-grid">
-        <div class="chip" onclick="fillPrompt(this)">
-          <span class="chip-icon">💻</span>Write a Python web scraper
-        </div>
-        <div class="chip" onclick="fillPrompt(this)">
-          <span class="chip-icon">⚛️</span>Explain quantum computing
-        </div>
-        <div class="chip" onclick="fillPrompt(this)">
-          <span class="chip-icon">📊</span>Summarize machine learning
-        </div>
-        <div class="chip" onclick="fillPrompt(this)">
-          <span class="chip-icon">✍️</span>Give me a creative story idea
-        </div>
+        <button class="chip" onclick="sendChip('Explain quantum computing in simple terms')">
+          <span class="chip-icon">💡</span>
+          Explain quantum computing in simple terms
+        </button>
+        <button class="chip" onclick="sendChip('Write a Python script for web scraping')">
+          <span class="chip-icon">🐍</span>
+          Write a Python script for web scraping
+        </button>
+        <button class="chip" onclick="sendChip('Draft a professional email to a client')">
+          <span class="chip-icon">📝</span>
+          Draft a professional email to a client
+        </button>
+        <button class="chip" onclick="sendChip('Suggest ideas for a new web project')">
+          <span class="chip-icon">🚀</span>
+          Suggest ideas for a new web project
+        </button>
       </div>
     </div>
     {% endif %}
@@ -640,25 +695,32 @@
   <!-- Input area -->
   <div id="input-area">
     <div class="input-container">
+      <div id="attachment-preview" style="display:none; padding:8px 12px; gap:8px; align-items:center; flex-wrap:wrap; background:var(--card); border-radius:12px; margin-bottom:8px; border:1px solid var(--border2);"></div>
+      <input type="file" id="file-input" style="display:none;" accept=".txt,.md,.py,.js,.html,.css,.json,.csv,.c,.cpp,.h,.java,.pdf,.png,.jpg,.jpeg,.gif,.svg,.webp" multiple />
       <div class="input-box">
+        <button id="plus-btn" title="Attach file">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
         <textarea
           id="prompt-input"
-          placeholder="Message GenAI..."
+          placeholder="Ask anything or attach a file (+)"
           rows="1"
           maxlength="4000"
           autofocus
         ></textarea>
-        <div class="input-actions">
-          <span id="char-count">0 / 4000</span>
+        <div class="input-right">
+          <button id="mic-btn" title="Voice input">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+          </button>
           <button id="send-btn" title="Send (Enter)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/>
             </svg>
           </button>
         </div>
       </div>
-      <div class="hint">Press <kbd>Enter</kbd> to send &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> for new line</div>
+      <div class="hint"><span id="char-count">0 / 4000</span> &nbsp;·&nbsp; Press <kbd>Enter</kbd> to send &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> for new line</div>
     </div>
   </div>
 
@@ -674,10 +736,110 @@
   const input      = document.getElementById('prompt-input');
   const sendBtn    = document.getElementById('send-btn');
   const charCount  = document.getElementById('char-count');
-  const clearBtn   = document.getElementById('clear-btn');
+  const clearBtn   = document.querySelector('.delete-btn');
   const sidebar    = document.getElementById('sidebar');
   const menuBtn    = document.getElementById('menu-btn');
   const newChatBtn = document.getElementById('new-chat-btn');
+
+  const plusBtn           = document.getElementById('plus-btn');
+  const fileInput         = document.getElementById('file-input');
+  const attachmentPreview = document.getElementById('attachment-preview');
+  const micBtn            = document.getElementById('mic-btn');
+  const themeToggleBtn    = document.getElementById('theme-toggle-btn');
+  const themeIcon         = document.getElementById('theme-icon');
+  const themeText         = document.getElementById('theme-text');
+
+  let attachedFiles = [];
+
+  // ── Theme Switcher ──
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('genai-theme', theme);
+    if (theme === 'light') {
+      if (themeIcon) themeIcon.textContent = '☀️';
+      if (themeText) themeText.textContent = 'Light';
+    } else {
+      if (themeIcon) themeIcon.textContent = '🌙';
+      if (themeText) themeText.textContent = 'Dark';
+    }
+  }
+
+  const savedTheme = localStorage.getItem('genai-theme') || 'dark';
+  setTheme(savedTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // ── File attachment via + button ──
+  plusBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      if (file.type.startsWith('image/')) {
+        reader.onload = (evt) => {
+          attachedFiles.push({ name: file.name, type: 'image', content: evt.target.result });
+          renderAttachments();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        reader.onload = (evt) => {
+          attachedFiles.push({ name: file.name, type: 'text', content: evt.target.result });
+          renderAttachments();
+        };
+        reader.readAsText(file);
+      }
+    });
+    fileInput.value = '';
+  });
+
+  function renderAttachments() {
+    if (attachedFiles.length === 0) {
+      attachmentPreview.style.display = 'none';
+      attachmentPreview.innerHTML = '';
+      return;
+    }
+    attachmentPreview.style.display = 'flex';
+    attachmentPreview.innerHTML = attachedFiles.map((file, idx) => `
+      <div style="display:flex;align-items:center;gap:6px;background:var(--card2);padding:4px 10px;border-radius:8px;font-size:0.78rem;border:1px solid var(--border2);color:var(--text);">
+        <span>${file.type === 'image' ? '🖼️' : '📄'} ${escapeHtml(file.name)}</span>
+        <button onclick="removeAttachment(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-weight:bold;margin-left:4px;font-size:0.9rem;" title="Remove attachment">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function removeAttachment(idx) {
+    attachedFiles.splice(idx, 1);
+    renderAttachments();
+  }
+
+  // ── Voice Input (Speech Recognition) ──
+  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    micBtn.addEventListener('click', () => {
+      micBtn.style.color = 'var(--danger)';
+      recognition.start();
+    });
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      input.value = (input.value ? input.value + ' ' : '') + transcript;
+      micBtn.style.color = 'var(--muted)';
+    };
+
+    recognition.onerror = recognition.onend = () => {
+      micBtn.style.color = 'var(--muted)';
+    };
+  }
 
   // ── Render existing markdown on page load ──
   document.querySelectorAll('.md-content').forEach(el => {
@@ -704,8 +866,10 @@
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 160) + 'px';
     const len = input.value.length;
-    charCount.textContent = len + ' / 4000';
-    charCount.classList.toggle('warn', len > 3800);
+    if (charCount) {
+      charCount.textContent = len + ' / 4000';
+      charCount.classList.toggle('warn', len > 3800);
+    }
   });
 
   // ── Enter to send ──
@@ -715,16 +879,36 @@
 
   sendBtn.addEventListener('click', sendMessage);
 
+  function sendChip(promptText) {
+    input.value = promptText;
+    sendMessage();
+  }
+
   // ── Send message ──
   async function sendMessage() {
-    const prompt = input.value.trim();
-    if (!prompt || sendBtn.disabled) return;
+    let userPrompt = input.value.trim();
+    if (!userPrompt && attachedFiles.length === 0) return;
+    if (sendBtn.disabled) return;
+
+    // Combine prompt with attached files
+    let fullPrompt = userPrompt;
+    if (attachedFiles.length > 0) {
+      attachedFiles.forEach(f => {
+        if (f.type === 'text') {
+          fullPrompt += `\n\n--- Attached File: ${f.name} ---\n\`\`\`\n${f.content}\n\`\`\``;
+        } else if (f.type === 'image') {
+          fullPrompt += `\n\n[Attached Image File: ${f.name}]`;
+        }
+      });
+    }
 
     removeEmptyState();
-    appendMessage('user', prompt);
+    appendMessage('user', userPrompt || `[Attached ${attachedFiles.length} file(s)]`);
     input.value = '';
     input.style.height = 'auto';
-    charCount.textContent = '0 / 4000';
+    attachedFiles = [];
+    renderAttachments();
+    if (charCount) charCount.textContent = '0 / 4000';
     sendBtn.disabled = true;
 
     const typingEl = appendTyping();
@@ -733,7 +917,7 @@
       const res = await fetch(SEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt: fullPrompt })
       });
       const data = await res.json();
       typingEl.remove();
@@ -747,9 +931,10 @@
     }
   }
 
-  // ── Clear chat ──
-  clearBtn.addEventListener('click', () => {
-    if (!confirm('Clear the entire conversation?')) return;
+  // ── Delete (clear) chat via sidebar X button ──
+  clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!confirm('Delete this conversation?')) return;
     clearConversation();
   });
 
@@ -811,12 +996,6 @@
     });
   }
 
-  // ── Suggestion chips ──
-  function fillPrompt(chip) {
-    input.value = chip.innerText.replace(/^[^\w]+/, '').trim();
-    input.dispatchEvent(new Event('input'));
-    input.focus();
-  }
 
   // ── Helpers ──
   function scrollToBottom() { chatWindow.scrollTop = chatWindow.scrollHeight; }
@@ -829,17 +1008,8 @@
   function showEmptyState() {
     chatWindow.innerHTML = `
       <div id="empty-state">
-        <div class="welcome-icon">✦</div>
-        <div>
-          <h2>Hello! I'm <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GenAI</span></h2>
-          <p style="margin-top:8px;color:var(--text2);font-size:0.9rem;max-width:360px;line-height:1.7;">Start a fresh conversation — ask me anything!</p>
-        </div>
-        <div class="chips-grid">
-          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">💻</span>Write a Python web scraper</div>
-          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">⚛️</span>Explain quantum computing</div>
-          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">📊</span>Summarize machine learning</div>
-          <div class="chip" onclick="fillPrompt(this)"><span class="chip-icon">✍️</span>Give me a creative story idea</div>
-        </div>
+        <img src="${LOGO_URL}" class="welcome-icon" style="object-fit:cover;border-radius:20px;" alt="GenAI"/>
+        <h2>Ask anything</h2>
       </div>`;
   }
 
