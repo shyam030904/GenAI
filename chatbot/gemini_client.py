@@ -26,9 +26,8 @@ from .api_key_manager import PermanentAPIError
 logger = logging.getLogger(__name__)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-# gemini-2.0-flash was retired by Google on 2026-10-04.
-# Current stable fast model is gemini-2.5-flash.
-DEFAULT_MODEL     = "gemini-2.5-flash"
+# Google recommended model: gemini-3.8-flash
+DEFAULT_MODEL     = "gemini-3.8-flash"
 MAX_OUTPUT_TOKENS = 2048
 TEMPERATURE       = 0.7
 MAX_HISTORY_TURNS = 10   # truncate history to limit token usage

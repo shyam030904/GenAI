@@ -97,6 +97,11 @@ def generate_response(prompt: str, history: list) -> str:
                 exc.http_status,
                 str(exc),
             )
+            if exc.http_status == 404:
+                return (
+                    "⚠️ The configured AI model was not found or is deprecated. "
+                    "Please check your AI_MODEL configuration."
+                )
             return (
                 "⚠️ The AI service returned an error with your request. "
                 "Please rephrase your message and try again."

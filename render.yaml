@@ -16,9 +16,9 @@ services:
         sync: false
 
       # ── Optional overrides ───────────────────────────────────────────────
-      # AI_MODEL defaults to "gemini-2.0-flash" if not set
+      # AI_MODEL defaults to "gemini-3.8-flash" if not set
       # - key: AI_MODEL
-      #   value: gemini-2.0-flash
+      #   value: gemini-3.8-flash
 
       # ── Runtime ─────────────────────────────────────────────────────────
       - key: PYTHON_VERSION
