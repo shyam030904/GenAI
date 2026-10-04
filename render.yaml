@@ -5,7 +5,21 @@ services:
     buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
     startCommand: "gunicorn genai_app.wsgi:application"
     envVars:
-      - key: OPENAI_API_KEY
+      # ── Required: Gemini API keys (add at least API_KEY_1) ──────────────
+      # Set these in Render Dashboard → Environment → Add Variable.
+      # Never put real key values here; this file is committed to Git.
+      - key: API_KEY_1
         sync: false
+      - key: API_KEY_2
+        sync: false
+      - key: API_KEY_3
+        sync: false
+
+      # ── Optional overrides ───────────────────────────────────────────────
+      # AI_MODEL defaults to "gemini-2.0-flash" if not set
+      # - key: AI_MODEL
+      #   value: gemini-2.0-flash
+
+      # ── Runtime ─────────────────────────────────────────────────────────
       - key: PYTHON_VERSION
         value: 3.12.0
