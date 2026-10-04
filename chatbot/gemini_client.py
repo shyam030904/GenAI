@@ -26,7 +26,9 @@ from .api_key_manager import PermanentAPIError
 logger = logging.getLogger(__name__)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-DEFAULT_MODEL     = "gemini-2.0-flash"
+# gemini-2.0-flash was retired by Google on 2026-10-04.
+# Current stable fast model is gemini-2.5-flash.
+DEFAULT_MODEL     = "gemini-2.5-flash"
 MAX_OUTPUT_TOKENS = 2048
 TEMPERATURE       = 0.7
 MAX_HISTORY_TURNS = 10   # truncate history to limit token usage
@@ -35,7 +37,8 @@ MAX_HISTORY_TURNS = 10   # truncate history to limit token usage
 RETRYABLE_HTTP_CODES = {429, 500, 502, 503, 504}
 
 # HTTP codes that mean "the request is broken, rotating keys won't help"
-PERMANENT_HTTP_CODES = {400, 403, 404, 422}
+# NOTE: 400 may also mean invalid API key — see _is_key_error() below.
+PERMANENT_HTTP_CODES = {403, 404, 422}
 
 
 # ── Internal retryable marker ─────────────────────────────────────────────────
@@ -44,6 +47,24 @@ class _RetryableGeminiError(Exception):
     def __init__(self, message: str, http_status: int | None = None):
         super().__init__(message)
         self.http_status = http_status
+
+
+# ── Key-error detector ────────────────────────────────────────────────────────
+def _is_key_error(exc: "ClientError") -> bool:
+    """
+    Return True when a ClientError is caused by an invalid/disabled API key.
+
+    Gemini returns HTTP 400 (INVALID_ARGUMENT) for bad keys, NOT 401.
+    We check the error reason field so we only rotate on key problems,
+    not on genuinely malformed requests.
+    """
+    details_str = str(getattr(exc, "details", "") or "").upper()
+    message_str = (getattr(exc, "message", "") or str(exc)).lower()
+    return (
+        "api_key_invalid" in details_str          # machine-readable reason
+        or "api key not valid" in message_str     # human-readable message
+        or ("key" in message_str and "valid" in message_str)
+    )
 
 
 # ── History conversion ────────────────────────────────────────────────────────
@@ -160,15 +181,25 @@ def call_gemini(
         # 4xx errors
         code = getattr(exc, "code", None)
         logger.warning(
-            "GeminiClient: %s → ClientError HTTP %s: %s",
+            "GeminiClient: %s -> ClientError HTTP %s: %s",
             key_label, code, exc.message or str(exc),
         )
         if code == 429:
-            # 429 from ClientError = quota exhausted → rotate
+            # 429 = quota exhausted -> rotate to next key
             raise _RetryableGeminiError(str(exc), http_status=429) from exc
+        if code == 400 and _is_key_error(exc):
+            # Gemini returns HTTP 400 (not 401) for invalid/disabled API keys.
+            # Treat as retryable so the manager tries the next configured key.
+            logger.warning(
+                "GeminiClient: %s -> invalid API key (HTTP 400 API_KEY_INVALID) "
+                "- rotating to next key.",
+                key_label,
+            )
+            raise _RetryableGeminiError(str(exc), http_status=400) from exc
         if code in PERMANENT_HTTP_CODES:
+            # e.g. malformed prompt, unsupported model — rotating keys won't help
             raise PermanentAPIError(str(exc), http_status=code) from exc
-        # 401 (invalid key) → retryable — try next key
+        # 401, and any other 4xx -> retryable (try next key)
         raise _RetryableGeminiError(str(exc), http_status=code) from exc
 
     except ServerError as exc:
